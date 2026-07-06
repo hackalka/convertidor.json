@@ -3,51 +3,44 @@
 <head>
     <title>Link to JSON Converter</title>
 </head>
-<body style="display: flex; flex-direction: column; gap: 20px; max-width: 800px; margin: 0 auto; background: #f0f2f5; font-family: 'Segoe UI', sans-serif;">
+<body style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; background: #f0f2f5; font-family: 'Segoe UI', sans-serif;">
     <div style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <h2 style="color: #2c3e50; text-align: center;">Convert Link to JSON</h2>
-        <form id="linkForm" style="display: flex; gap: 15px; margin: 20px 0;">
-            <input type="text" id="linkInput" placeholder="Paste URL" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" />
-            <button type="submit" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">Convert</button>
-        </form>
-        <div style="background: #fff; padding: 25px; border-radius: 10px; margin-top: 20px;">
-            <pre id="jsonOutput" style="white-space: pre-wrap; word-wrap: break-word; background: #f8f9fa; padding: 15px; border-radius: 5px;"></pre>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button id="copyBtn" style="padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 5px;">Copy JSON</button>
-                <button id="downloadBtn" style="padding: 10px 15px; background: #e67e22; color: white; border: none; border-radius: 5px;">Download JSON</button>
-            </div>
+        <h2 style="color: #2c3e50; text-align: left;">Pega tu lista M3U aquí:</h2>
+        <textarea id="m3uInput" style="flex: 1; padding: 15px; border: 1px solid #ccc; border-radius: 5px; height: 150px;"></textarea>
+        <button id="convertBtn" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Convertir a JSON</button>
+    </div>
+    <div style="background: #fff; padding: 25px; border-radius: 10px; margin-top: 20px;" id="jsonContainer">
+        <pre id="jsonOutput" style="white-space: pre-wrap; word-wrap: break-word; background: #f8f9fa; padding: 15px; border-radius: 5px;"></pre>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="copyBtn" style="padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 5px;">Copiar JSON</button>
+            <button id="downloadBtn" style="padding: 10px 15px; background: #e67e22; color: white; border: none; border-radius: 5px;">Descargar JSON</button>
         </div>
     </div>
     <script src="convertidor.js"></script>
     <script>
-        document.getElementById('linkForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const link = document.getElementById('linkInput').value;
-            fetch(link)
-                .then(response => response.text())
-                .then(text => {
-                    const lines = text.split('\n');
-                    const samples = [];
-                    let currentName = '';
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const m3u = document.getElementById('m3uInput').value;
+            const lines = m3u.split('\n');
+            const samples = [];
+            let currentName = '';
 
-                    for (let line of lines) {
-                        if (line.startsWith('#EXTINF:')) {
-                            currentName = line.split(',').slice(1).join('').trim() || 'Canal sin nombre';
-                        } else if (line.startsWith('http://') || line.startsWith('https://')) {
-                            samples.push({
-                                name: currentName,
-                                uri: line
-                            });
-                            currentName = '';
-                        }
-                    }
+            for (let line of lines) {
+                if (line.startsWith('#EXTINF:')) {
+                    currentName = line.split(',').slice(1).join('').trim() || 'Canal sin nombre';
+                } else if (line.startsWith('http://') || line.startsWith('https://')) {
+                    samples.push({
+                        name: currentName,
+                        uri: line
+                    });
+                    currentName = '';
+                }
+            }
 
-                    const json = {
-                        name: 'Lista de Canales M3U',
-                        samples: samples
-                    };
-                    document.getElementById('jsonOutput').textContent = JSON.stringify(json, null, 2);
-                });
+            const json = {
+                name: 'Lista de Canales M3U',
+                samples: samples
+            };
+            document.getElementById('jsonOutput').textContent = JSON.stringify(json, null, 2);
         });
 
         document.getElementById('copyBtn').addEventListener('click', function() {
