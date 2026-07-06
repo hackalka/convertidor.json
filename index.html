@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Link to JSON Converter</title>
+</head>
+<body>
+    <h1>Convert Link to JSON</h1>
+    <form id="linkForm">
+        <input type="text" id="linkInput" placeholder="Enter URL">
+        <button type="submit">Convert</button>
+    </form>
+    <pre id="jsonOutput"></pre>
+    <script src="convertidor.js"></script>
+    <script>
+        document.getElementById('linkForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const link = document.getElementById('linkInput').value;
+            // Call the conversion function from convertidor.js
+            const json = convertidor.convertLinkToJson(link);
+            document.getElementById('jsonOutput').textContent = JSON.stringify(json, null, 2);
+        });
+    </script>
+</body>
+</html>
